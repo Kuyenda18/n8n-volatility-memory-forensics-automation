@@ -20,6 +20,7 @@ This review was performed while converting the local DFIR automation workspace i
 - Created a portfolio README, Dockerfile, Docker Compose file, and Streamlit dashboard script.
 - Added `.gitignore` rules for memory dumps, raw reports, n8n state, logs, SQLite databases, local virtual environments, third-party tool checkouts, and the original `DFIR_Project/` workspace.
 - No raw memory dump, n8n database, encryption key, log file, or personal report was copied into the publishable project structure.
+- Added `docs/sample-memory-dump.md` to explain how to handle the local lab memory image without committing it.
 
 ## Recommended Follow-Up
 

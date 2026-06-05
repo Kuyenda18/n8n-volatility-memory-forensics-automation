@@ -14,6 +14,8 @@ The automation flow is designed to support a memory-forensics triage workflow:
 4. Save the combined output as `triage_lockdown_report.json`.
 5. Review the JSON output through a Streamlit dashboard.
 
+No external API keys are required. The project runs locally with Docker, n8n, Volatility3, Python, and Streamlit.
+
 ## Security Use Case
 
 This project is related to:
@@ -24,10 +26,22 @@ This project is related to:
 - SOC investigation workflow support.
 - Repeatable triage output generation for analyst review.
 
+## Architecture
+
+The design follows the four-layer structure described in the original project report:
+
+- Infrastructure and I/O layer: WSL2/Docker runtime, mounted input/output folders, and local memory image handling.
+- Orchestration layer: n8n watches for new memory images and controls the analysis workflow.
+- Core analysis layer: Volatility3 extracts process, network, and injected-memory artifacts.
+- Normalization and visualization layer: plugin output is combined into JSON and reviewed in a Streamlit dashboard.
+
+The repo keeps these layers separated so the workflow can be extended with additional Volatility plugins, enrichment logic, or reporting modules without changing the whole pipeline.
+
 ## Tech Stack
 
 - n8n
 - Docker and Docker Compose
+- WSL2-compatible local lab setup
 - Volatility3
 - Python
 - Streamlit
@@ -45,6 +59,8 @@ This project is related to:
 |-- .env.example
 |-- .gitignore
 |-- docs/
+|   |-- architecture.md
+|   |-- sample-memory-dump.md
 |   `-- security-review.md
 |-- sample-data/
 |   `-- triage_lockdown_report.sample.json
@@ -74,6 +90,20 @@ Combined JSON report
         v
 Streamlit dashboard review
 ```
+
+The default workflow uses these Volatility3 plugins:
+
+| Plugin | Purpose |
+| --- | --- |
+| `windows.pslist` | Lists running processes from memory. |
+| `windows.netscan` | Extracts sockets and network connections. |
+| `windows.malfind` | Identifies suspicious executable memory regions. |
+
+The combined report groups the output under:
+
+- `network_connections`
+- `process_list`
+- `injected_memory`
 
 ## Setup
 
@@ -144,6 +174,7 @@ sample-data/triage_lockdown_report.sample.json
 
 - This repository does not include memory dumps, raw forensic output, n8n runtime databases, or third-party tool checkouts.
 - The included workflow is a sanitized export intended for lab use and portfolio review.
+- The original lab memory dump is about 4.7 GB. It is intentionally not committed because normal GitHub repositories are not suitable for files of that size.
 - Volatility3 plugin results depend on the memory image, operating system, symbols, and plugin compatibility.
 - The dashboard is a triage aid, not a full forensic report.
 - Only analyze memory images that you are authorized to examine.

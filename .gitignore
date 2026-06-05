@@ -1,0 +1,52 @@
+# Original local workspace and personal report artifacts
+DFIR_Project/
+*.docx
+
+# n8n local state
+n8n-data/
+config/
+database.sqlite
+*.sqlite
+*.db
+*.log
+
+# Memory forensic artifacts and runtime output
+watch-folder/
+watch_folder/
+output-json/
+output_json/
+output/
+*.mem
+*.raw
+*.vmem
+*.dmp
+*.dump
+triage_lockdown_report.json
+*triage*report*.json
+!sample-data/*.json
+
+# Volatility source/vendor checkout
+tools/
+!tools/.gitkeep
+tools/volatility3/
+volatility3/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+dfir_env/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.Zone.Identifier
+.vscode/
+.idea/

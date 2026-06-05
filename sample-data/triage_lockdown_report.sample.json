@@ -1,0 +1,42 @@
+{
+  "status": "success",
+  "artifacts": {
+    "network_connections": [
+      {
+        "PID": 1576,
+        "Owner": "svchost.exe",
+        "LocalAddr": "192.0.2.10",
+        "LocalPort": 49710,
+        "ForeignAddr": "93.184.216.34",
+        "ForeignPort": 443,
+        "Proto": "TCPv4",
+        "State": "ESTABLISHED"
+      }
+    ],
+    "process_list": [
+      {
+        "PID": 4,
+        "PPID": 0,
+        "ImageFileName": "System",
+        "CreateTime": "2024-09-10T05:29:00Z"
+      },
+      {
+        "PID": 1576,
+        "PPID": 908,
+        "ImageFileName": "svchost.exe",
+        "CreateTime": "2024-09-10T05:30:12Z"
+      }
+    ],
+    "injected_memory": [
+      {
+        "PID": 4200,
+        "Process": "RegSvcs.exe",
+        "Protection": "PAGE_EXECUTE_READWRITE",
+        "Tag": "VadS",
+        "Notes": "MZ header",
+        "Start VPN": 260702208,
+        "End VPN": 260706303
+      }
+    ]
+  }
+}

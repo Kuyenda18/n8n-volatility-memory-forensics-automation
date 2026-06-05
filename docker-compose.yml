@@ -1,0 +1,18 @@
+services:
+  n8n-volatility:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: n8n-volatility-dfir:latest
+    container_name: n8n-volatility-dfir
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Asia/Ho_Chi_Minh}
+      - TZ=${TZ:-Asia/Ho_Chi_Minh}
+    volumes:
+      - ./n8n-data:/home/node/.n8n
+      - ./watch-folder:/data/input
+      - ./output-json:/data/output
+      - ./tools/volatility3:/opt/volatility3:ro

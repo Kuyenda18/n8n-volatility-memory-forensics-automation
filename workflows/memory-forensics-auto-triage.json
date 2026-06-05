@@ -1,0 +1,76 @@
+{
+  "name": "Memory Forensics Auto-Triage",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "triggerOn": "folder",
+        "path": "/data/input",
+        "events": [
+          "add"
+        ],
+        "options": {}
+      },
+      "id": "5c515e2b-c176-4c77-b9d7-e4d4750d01f0",
+      "name": "Local File Trigger",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [
+        780,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "command": "FILE={{$json.path}}\n\n/opt/conda/bin/python3 /opt/volatility3/vol.py -q -f \"$FILE\" -r json windows.netscan > /tmp/netscan.json 2>/tmp/netscan.err\n/opt/conda/bin/python3 /opt/volatility3/vol.py -q -f \"$FILE\" -r json windows.pslist > /tmp/pslist.json 2>/tmp/pslist.err\n/opt/conda/bin/python3 /opt/volatility3/vol.py -q -f \"$FILE\" -r json windows.malfind > /tmp/malfind.json 2>/tmp/malfind.err\n\n/opt/conda/bin/python3 -c '\nimport json\nfrom pathlib import Path\n\n\ndef load_json(path):\n    try:\n        with open(path, \"r\", encoding=\"utf-8\") as f:\n            return json.load(f)\n    except Exception:\n        return []\n\noutput = {\n    \"status\": \"success\",\n    \"artifacts\": {\n        \"network_connections\": load_json(\"/tmp/netscan.json\"),\n        \"process_list\": load_json(\"/tmp/pslist.json\"),\n        \"injected_memory\": load_json(\"/tmp/malfind.json\"),\n    },\n}\n\noutput_path = Path(\"/data/output/triage_lockdown_report.json\")\noutput_path.parent.mkdir(parents=True, exist_ok=True)\nwith open(output_path, \"w\", encoding=\"utf-8\") as out_file:\n    json.dump(output, out_file, indent=2)\n\nprint(json.dumps(output))\n'"
+      },
+      "id": "35ebe068-0bfb-44f2-96c7-5142afcbf715",
+      "name": "Run Volatility3 Triage",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\n\nfor (const item of $input.all()) {\n  if (item.json.error && !item.json.stdout) {\n    results.push({ json: { status: \"failed\", raw_error: item.json.error.message } });\n    continue;\n  }\n\n  try {\n    const parsedData = JSON.parse(item.json.stdout);\n    results.push({ json: parsedData });\n  } catch (err) {\n    results.push({ json: { status: \"parsing_error\", raw_stdout: item.json.stdout } });\n  }\n}\n\nreturn results;"
+      },
+      "id": "11d5b5fe-1f96-4b77-a867-2c39d4bb914d",
+      "name": "Parse Volatility Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Local File Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run Volatility3 Triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Volatility3 Triage": {
+      "main": [
+        [
+          {
+            "node": "Parse Volatility Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}
